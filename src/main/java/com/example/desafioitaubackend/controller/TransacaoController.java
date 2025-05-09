@@ -28,4 +28,10 @@ public class TransacaoController {
         }
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
     }
+
+    @DeleteMapping("/transacao")
+    public ResponseEntity<Void> removerTransacoes() {
+        transacaoService.removerTrasacoes();
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }
