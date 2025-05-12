@@ -23,26 +23,43 @@ public class EstatisticaServiceImpl implements EstatisticaService {
 
     @Override
     public Map<String, Number> calcularEstatistica() {
-        Map<String, Number> estatistica = new LinkedHashMap<>();
-        List<Transacao> trasacoesFiltradas = filtrarTransacao(transacaoService.getTransacoes(), 60);
+        return calcularEstatistica(60);
+    }
+
+    @Override
+    public Map<String, Number> calcularEstatistica(int segundos) {
+        List<Transacao> trasacoesFiltradas = filtrarTransacao(transacaoService.getTransacoes(), segundos);
+
+        if (trasacoesFiltradas.isEmpty()){
+            return criarEstatisticasVazias();
+        }
 
         DoubleSummaryStatistics stats = trasacoesFiltradas.stream()
-                        .mapToDouble(Transacao::getValor)
-                                .summaryStatistics();
+                .mapToDouble(Transacao::getValor)
+                .summaryStatistics();
 
-        estatistica.put("count", stats.getCount());
-        estatistica.put("sum", stats.getSum());
-        estatistica.put("avg", stats.getAverage());
-        estatistica.put("min", stats.getMin());
-        estatistica.put("max", stats.getMax());
+        return Map.of(
+                "count", stats.getCount(),
+                "sum", stats.getSum(),
+                "avg", stats.getAverage(),
+                "min", stats.getMin(),
+                "max", stats.getMax()
+        );
+    }
 
-        return estatistica;
+    private Map<String, Number> criarEstatisticasVazias() {
+        return Map.of(
+                "count", 0,
+                "sum", 0,
+                "avg", 0,
+                "min", 0,
+                "max", 0
+        );
     }
 
     @Override
     public List<Transacao> filtrarTransacao(List<Transacao> transacoes, int segundos) {
-        OffsetDateTime agora = OffsetDateTime.now();
-        OffsetDateTime limite = agora.minusSeconds(segundos);
+        OffsetDateTime limite = OffsetDateTime.now().minusSeconds(segundos);
 
         return transacoes.stream()
                 .filter(transacao -> transacao.getDataHora().isAfter(limite))

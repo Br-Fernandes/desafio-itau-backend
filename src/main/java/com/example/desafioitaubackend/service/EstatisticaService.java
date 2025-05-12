@@ -9,6 +9,8 @@ public interface EstatisticaService {
 
     public Map<String, Number> calcularEstatistica();
 
+    public Map<String, Number> calcularEstatistica(int segundos);
+
     public List<Transacao> filtrarTransacao(List<Transacao> transacoes, int segundos);
 
 }
